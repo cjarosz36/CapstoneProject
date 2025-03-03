@@ -32,3 +32,4 @@ Usage
 
 Run the Jupyter Notebook to process the dataset and train the model. Modify parameters as needed for experimentation.
 https://public.tableau.com/app/profile/carson.jarosz/viz/CapstonBarChart/Sheet1?publish=yes
+https://public.tableau.com/app/profile/carson.jarosz/viz/CapstonBarChart/Sheet2?publish=yes
