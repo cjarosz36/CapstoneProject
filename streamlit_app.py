@@ -1,22 +1,41 @@
 import streamlit as st
+import pandas as pd
 import joblib
-import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Load the trained model
-@st.cache_resource
-def load_model():
-    return joblib.load("spending_model.pkl")
+# Load data
+df = pd.read_csv("user_spending.csv")
 
-model = load_model()
+# Load trained model
+model = joblib.load("spending_model.pkl")
 
-# Streamlit UI
-st.title("Steam Spending Predictor")
+# Sidebar navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Select Page", ["EDA", "Modeling"])
 
-st.sidebar.header("User Input Features")
-games_owned = st.sidebar.number_input("Number of Games Owned", min_value=0, max_value=1000, value=10)
+if page == "EDA":
+    st.title("Exploratory Data Analysis (EDA)")
 
-if st.sidebar.button("Predict Spending"):
-    features = np.array([[games_owned]])  # Adjust based on your model
-    prediction = model.predict(features)
-    st.subheader(f"Estimated Spending: ${prediction[0]:,.2f}")
+    st.write("### User Spending Distribution")
+    fig, ax = plt.subplots()
+    sns.histplot(df["total_spent_usd"], bins=50, kde=True, ax=ax)
+    ax.set_xlabel("Total Spent (USD)")
+    ax.set_ylabel("Number of Users")
+    st.pyplot(fig)
+
+    st.write("### Top 10 Spending Users")
+    top_users = df.sort_values(by="total_spent_usd", ascending=False).head(10)
+    st.bar_chart(top_users.set_index("playerid")["total_spent_usd"])
+
+elif page == "Modeling":
+    st.title("User Spending Prediction")
+
+    st.write("Enter user details to predict spending:")
+    num_games_owned = st.number_input("Number of Games Owned", min_value=0, step=1)
+    
+    # Make prediction
+    prediction = model.predict([[num_games_owned]])[0]
+    st.write(f"### Predicted Spending: **${prediction:.2f}**")
+
 
